@@ -84,7 +84,7 @@ legend1 {
 	height: 20px;
 }
 
-#transition {
+#transition, #initposition, #initdirection{
 	width:100%;
 }
 
@@ -145,3 +145,5 @@ a.activeslide { background: #469df5; }
 .dropzone{
 	padding-bottom: 5px;
 }
+
+a.moved { opacity: 0.2; }

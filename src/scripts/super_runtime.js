@@ -29,6 +29,21 @@ $(function() {
 			newinterval = 5000;
 			$("input[name='optinterval']").val(newinterval);
 		}
+		var fpsinterval = parseInt($("input[name='fpsinterval']").val(), 10); 
+		if (isNaN(fpsinterval)) {
+			fpsinterval = 16;
+			$("input[name='fpsinterval']").val(fpsinterval);
+		}
+		var xspeed = parseFloat($("input[name='xspeed']").val(), 10); 
+		if (isNaN(xspeed)) {
+			xspeed = 0.008;
+			$("input[name='xspeed']").val(xspeed);
+		}
+		var yspeed = parseFloat($("input[name='yspeed']").val(), 10); 
+		if (isNaN(yspeed)) {
+			yspeed = 0.0035;
+			$("input[name='yspeed']").val(yspeed);
+		}
 		if ($.superbg_slideshowActive) { // restart slideshow
 			clearInterval($.superbg_interval);
 			return $('#thumbs').startSlideShow();
@@ -85,9 +100,22 @@ $(function() {
 		// image scaletofit
 		var newscaletofit = 0;
 		if ($("input[name='optscaletofit']:checked").val() == 'on') {
-			newscaletofit = 1;
+			newscaletofit = 1;	//勾选后肯定为1
+			$("input[name='optscaletofit']").css('opacity',0.5);
 		} else {
-			newscaletofit = 0;
+			newscaletofit = $.fn.superbgimage.options.scaletofit;
+			if(newscaletofit >= 2)	//去勾选
+			{
+				newscaletofit = 0;
+				$("input[name='optscaletofit']").prop('checked', false);
+				$("input[name='optscaletofit']").css('opacity',1);
+			}
+			else	//屏蔽去勾选
+			{
+				newscaletofit += 1;
+				$("input[name='optscaletofit']").prop('checked', true);
+				$("input[name='optscaletofit']").css('opacity',1);
+			}
 		}
 		
 		// update options
@@ -112,7 +140,12 @@ $(function() {
 			randomtransition: parseInt(newrandomtransition, 10),
 			randomimage: parseInt(newrandomimage, 10),
 			onClick: onclickfunc,
-			scaletofit: parseInt(newscaletofit, 10)
+			scaletofit: parseInt(newscaletofit, 10),
+			initposition: parseInt($("#initposition").val(), 10),
+			initdirection: parseInt($("#initdirection").val(), 10),
+			fpsinterval: parseInt($("input[name='fpsinterval']").val(), 10),
+			xspeed: parseFloat($("input[name='xspeed']").val(), 10),
+			yspeed: parseFloat($("input[name='yspeed']").val(), 10)
 		};
 		
 		if (restart_slideshow){
@@ -242,6 +275,31 @@ $(function() {
 		update_superbgOptions();
 	});		
 
+	// change transition with selectbox
+	$("#initposition").change(function() {
+		update_superbgOptions();
+	});	
+	
+	// change transition with selectbox
+	$("#initdirection").change(function() {
+		update_superbgOptions();
+	});	
+	
+	// change option slide_interval
+	$("input[name='fpsinterval']").change(function() {
+		update_superbgOptions();
+	});	
+	
+	// change option slide_interval
+	$("input[name='xspeed']").change(function() {
+		update_superbgOptions();
+	});	
+	
+	// change option slide_interval
+	$("input[name='yspeed']").change(function() {
+		update_superbgOptions();
+	});	
+	
 	// change option transitionout
 	$("input[name='opttransout']").click(function() {
 		update_superbgOptions();
@@ -270,22 +328,26 @@ $(function() {
 	// change option scaletofit
 	$("input[name='optscaletofit']").click(function() {
 		update_superbgOptions();
-		var bufpos = $.superbg_imgActual;
-		var bufpos_showimage = $.fn.superbgimage.options.showimage;
-		var restart_slideshow = false;
-		if ($.superbg_slideshowActive){
-			$('#thumbs').stopSlideShow();
-			restart_slideshow = true;
-		}
-		//my_slideshowActive = false;
-		$('#showtitle').hide();
-		$.fn.superbgimage.options.showimage = bufpos;
-		$('#thumbs1').superbgimage({ reload: true }).show().removeClass('hidden');
-		$.fn.superbgimage.options.showimage = bufpos_showimage;
-		if (restart_slideshow){
-			$('#thumbs').startSlideShow();
-		}
-		//update_superbgControls();
+		// var bufpos = $.superbg_imgActual;
+		// var bufpos_showimage = $.fn.superbgimage.options.showimage;
+		// var restart_slideshow = false;
+		// if ($.superbg_slideshowActive){
+			// $('#thumbs').stopSlideShow();
+			// restart_slideshow = true;
+		// }
+			//// my_slideshowActive = false;
+		// $('#showtitle').hide();
+		// $.fn.superbgimage.options.showimage = bufpos;
+		// $('#thumbs1').superbgimage({ reload: true }).show().removeClass('hidden');
+		// $.fn.superbgimage.options.showimage = bufpos_showimage;
+		// if (restart_slideshow){
+			// $('#thumbs').startSlideShow();
+		// }
+			//// update_superbgControls();
+		afa_zoom = 1.0;
+		afa_zoom_old = 1.0;
+		afa_imageload = true;
+		$(this).superbgResize();
 	});		
 	
 	// toggle fieldsets
@@ -304,9 +366,9 @@ $(function() {
 		$(this).blur();
 		if ($("#overlay").hasClass('hidden')) {
 			$("#overlay").css('height','auto').removeClass('hidden').children().show();
-			if ($('#thumbs1').hasClass('hidden')) {
-				$('#thumbs1').hide();
-			}
+			// if ($('#thumbs1').hasClass('hidden')) {
+				// $('#thumbs1').hide();
+			// }
 			if ($('#thumbs2').hasClass('hidden')) {
 				$('#thumbs2').hide();
 			}
