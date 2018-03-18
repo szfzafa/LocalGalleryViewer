@@ -1,0 +1,121 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="de" xml:lang="de">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+
+	<title>localGalleryViewerExtension Gallery Window</title>
+ 
+	<link type="text/css" href="css/styles.css" media="screen" rel="stylesheet" />
+    <script type='text/javascript' src='scripts/jquery.min.js'></script>
+  	<script type="text/javascript" src="scripts/jquery.effects.core.min.js"></script>
+	<script type="text/javascript" src="scripts/jquery.effects.slide.min.js"></script>
+	<script type="text/javascript" src="scripts/jquery.effects.blind.min.js"></script>
+	<script type="text/javascript" src="scripts/jquery.superbgimage.min.js"></script>
+	<script type="text/javascript" src="scripts/super_init.js"></script>
+	<script type="text/javascript" src="scripts/super_runtime.js"></script>
+	<script type='text/javascript' src='scripts/dir_browser.js'></script>
+	
+
+</head>
+
+<body>
+
+	<div id="overlay">
+
+		<h1 title="Click to hide the control panel. It will fade out as soon as you move the mouse cursor out."><a href="#">localGalleryViewerExtension Gallery Window</a></h1>
+		
+		<fieldset id="control">
+			<legend class="legend">control</legend>
+			<div class="dropzone">
+			<p class="small">Open local directory or drag'n'drop it into the input field below.</p>
+			<input type="file" multiple webkitdirectory id="fileURL" value="choose directory" />
+			<br />
+			<input type="checkbox" name="parsesubfolders" id="parsesubfolders" title="Activate to search for images in subfolders as well."></input><label for="optrandom" class="small">parse subfolder</label><br />
+			</div>
+			<br />
+			<a class="prev" href="#" title="Go to previous image."><img class="controlbutton" id="control_back" src="css/media-seek-backward-3_inactive.png" /></a>
+			<a class="start" href="#" title="Start the slideshow."><img class="controlbutton" id="control_start" src="css/media-playback-start-3_inactive.png" /></a>
+			<a class="pausess" href="#" title="Pause/resume the slideshow."><img class="controlbutton" id="control_pause" src="css/media-playback-pause-3_inactive.png" /></a>
+			<a class="stop" href="#" title="Stop the slideshow"><img class="controlbutton" id="control_stop" src="css/media-playback-stop-3_inactive.png" /></a>
+			<a class="next" href="#" title="Go to next image."><img class="controlbutton" id="control_forward" src="css/media-seek-forward-3_inactive.png" /></a><br /><br />
+			<a class="loadset1" href="#" style="display:none" title="Go to first image."><img class="controlbutton" id="control_home" src="css/media-skip-home-3.png" /></a>
+			<a class="loadset2" href="#" style="display:none"></a>
+		</fieldset>
+		
+		<fieldset id="thumbs1">
+			<legend1 class="legend1">Image List</legend1>
+			<br style="clear:both"/>
+		</fieldset>
+		<fieldset id="thumbs2">
+			<legend1 class="legend1">select image (set 2)</legend1>			
+			<br style="clear:both"/>
+		</fieldset>
+		
+		<fieldset id="options">
+			<legend class="legend">options</legend>
+			<span>transition</span><br />
+			<select name="transition" id="transition" title="Choose a transition to the next image.">
+				<option value="0"> 0 - none</option>
+				<option value="1" selected="selected"> 1 - fade</option>
+				<option value="2"> 2 - slide down</option>
+				<option value="3"> 3 - slide left</option>
+				<option value="4"> 4 - slide top</option>
+				<option value="5"> 5 - slide right</option>
+				<option value="6"> 6 - blind horizontal</option>
+				<option value="7"> 7 - blind vertical</option>
+				<option value="90"> 90 - slide right/left</option>
+				<option value="91"> 91 - slide top/down</option>
+			</select><br /><br />
+			<input type="text" size="6" name="optspeed" id="optspeed" value="slow" title="Enter text (fast, slow) or the transition speed in milliseconds"></input><label for="optspeed">&nbsp;transition speed</label><br />
+			<input type="text" size="6" name="optinterval" id="optinterval" value="4000" title="Enter slideshow interval in milliseconds between two images."></input><label for="optinterval">&nbsp;slideshow interval</label><br />
+			<input type="checkbox" name="opttransout" id="opttransout" checked="checked" title="Activate transition for previous image"></input><label for="opttransout">transition out</label><br />
+			<input type="checkbox" name="optrandomtrans" id="optrandomtrans" title="Activate random transition for every image"></input><label for="optrandomtrans">random transition</label><br />
+			<input type="checkbox" name="optrandom" id="optrandom" checked="checked" title="Activate random image choice (slideshow and prev/next)"></input><label for="optrandom">random image</label><br />
+			<input type="checkbox" name="optclick" id="optclick" checked="checked" title="Activate click on screen for next image"></input><label for="optclick">click for next image</label><br />
+			<!--
+			<input type="checkbox" name="optshow" id="optshow" checked="checked" title="Activate the infobox in the lower right corner."></input><label for="optshow">show infobox for image</label><br />
+			-->
+			<input type="checkbox" name="optscaletofit" id="optscaletofit" checked="checked" title="Activate scaling image to fit into the browser window / otherwise it is scaled to fullscreen."></input><label for="optscaletofit">scale images to fit</label><br />
+			<br /><span>initial position</span><br />
+			<select name="initposition" id="initposition" title="Initial position of the next image.">
+				<option value="0" selected="selected"> 0 - center</option>
+				<option value="1"> 1 - left top</option>
+				<option value="2"> 2 - right top</option>
+				<option value="3"> 3 - left bottom</option>
+				<option value="4"> 4 - right bottom</option>
+			</select><br /><br />
+			<span>initial direction</span><br />
+			<select name="initdirection" id="initdirection" title="Initial moving direction of next image.">
+				<option value="0" selected="selected"> 0 - up left</option>
+				<option value="1"> 1 - up right</option>
+				<option value="2"> 2 - down left</option>
+				<option value="3"> 3 - down right</option>
+			</select><br /><br />
+			<input type="text" size="6" name="fpsinterval" id="fpsinterval" value="16" title="Enter the fresh interval in milliseconds, default 16"></input><label for="fpsinterval">&nbsp;fresh interval</label><br />
+			<input type="text" size="6" name="xspeed" id="xspeed" value="0.008" title="Enter horizonal speed factor, default 0.008"></input><label for="xspeed">&nbsp;horizonal speed factor</label><br />
+			<input type="text" size="6" name="yspeed" id="yspeed" value="0.0032" title="Enter vertical speed factor, default 0.0035"></input><label for="yspeed">&nbsp;vertical speed factor</label><br />
+		</fieldset>
+		
+		<p class="small">
+			<br />
+			<strong>localGalleryViewer Chrome Extension</strong> by <a href="http://www.humanmachine.de/">Andreas Meyer</a>
+			<br /><br />
+			Fullscreen Slideshow PlugIn: <a href="http://dev.andreaseberhard.de/projects/superbgimage/"><strong>SuperBGImage</strong></a> by <a href="http://andreaseberhard.de/">Andreas Eberhard</a>
+		</p>
+
+		<p class="small">
+			<br />
+			Version 1.4, 24.10.2013
+		</p>
+		
+	</div>
+
+	<div id="showtitle">
+		 <p class="imagecount small">no current image</p>
+		 <p class="title"></p>
+	</div>
+	
+</body>
+</html>

@@ -1,0 +1,94 @@
+<html>
+<head><title>localGalleryViewerExtension Options</title>
+
+<style type="text/css">
+<!--
+body {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	margin: 0;
+	padding: 20px;
+	font-size: 12px;
+	background: #333333;
+	color: #fff;
+}
+
+ { 
+	color: #fff;
+	text-decoration: none;
+}
+a:hover { 
+	color: #f00;
+}
+.small {
+	font-size:10px;
+}
+
+fieldset {
+	text-align: left;
+	margin-bottom: 10px;
+	padding: 10px;
+	border:solid 1px #555;
+	width: 470px;
+}
+fieldset * {
+	text-align: left;
+}
+legend {
+	color: #469df5;
+	display: block;	
+}
+legend1 {
+	color: #469df5;
+	display: block;	
+}
+#previewarea {
+	float: right;
+	width: 200px;
+	height: 200px;
+	background: #FFFFFF;
+	border: 2px solid #cccccc;
+
+}
+
+#pattern {
+	background-color: white;
+}
+-->
+</style>
+
+<script type="text/javascript" src="scripts/jscolor.js"></script>
+
+</head>
+
+<body>
+<h1>localGalleryViewerExtension Options</h1>
+
+<fieldset id="backgroundcontrol">
+	<legend class="legend">Gallery background color and pattern</legend>
+	<p class="small">Change the background color for the gallery</p>
+	<input class="color" id="bgcolor" value="66ff00">
+	<p class="small">Change the background pattern for the gallery</p>
+	<select id="pattern">
+	 <option value="">none</option>
+	 <option value="bg_pattern.png">stripes</option>
+	 <option value="bg_pattern2.png">blocks</option>
+	 <option value="bg_pattern3.png">dots</option>
+	 <option value="bg_pattern4.png">diamonds</option>
+	 <option value="bg_pattern5.png">blocks2</option>
+	 <option value="bg_pattern_big6.png">damask</option>
+	 <option value="bg_pattern_big7.png">paper</option>
+	</select>
+	<br />
+	<button id="defaultvalues">Reset to default</button>
+	<div id="previewarea"></div>
+</fieldset>
+
+
+<br>
+<div id="status"></div>
+<button id="save">Save</button>
+</body>
+
+<script src="scripts/options.js"></script>
+
+</html>
