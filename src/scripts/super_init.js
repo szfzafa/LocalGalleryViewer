@@ -15,6 +15,7 @@ afa_autoright = false;
 afa_autoup = false;
 afa_autodown = false;
 afa_notmove = false;
+afa_oldtime = new Date().getTime();
 
 $(function() {
 
@@ -33,6 +34,7 @@ $(function() {
 		slide_interval: 4000, // interval for the slideshow
 		randomimage: 1, // 0-none, 1-random image
 		speed: 'slow', // animation speed
+		outspeed: 800,	
 		preload: 0, // 0-none, 1-preload images
 		onShow: superbgimage_show, // function-callback show image
 		onClick: superbgimage_click, // function-callback click image
@@ -46,11 +48,11 @@ $(function() {
 		onMousedown: superbgimage_mousedown,
 		onDragstart: superbgimage_dragstart,
 		scaletofit: 2, // 0- no fitting, 1- fit image to view container
-		initposition: 0,
+		initposition: 1,
 		initdirection: 0,
-		fpsinterval: 16,
+		fpsinterval: 1,
 		xspeed: 0.008,
-		yspeed: 0.0035
+		yspeed: 1.0
 	};
 
 	// initialize SuperBGImage
@@ -58,7 +60,7 @@ $(function() {
 
 });
 
-var gLastImagePos = 0;
+//var gLastImagePos = 0;	//其实没啥用
 
 // function callback on hiding image
 function superbgimage_hide(img) {
@@ -70,14 +72,16 @@ function superbgimage_cleanup(img) {
 	//if (console && console.log) console.log("superbgimage_show: " + img + ", last imagepos: " + gLastImagePos);
 	$('img[rel]').each(function(index) {
 		var aktRelPos = $(this).attr("rel");
-		if (aktRelPos != img && aktRelPos != gLastImagePos){
+		if (aktRelPos != img// && aktRelPos != gLastImagePos	//去掉这个，可避免切换视频卡顿
+			){
 			//if (console && console.log) console.log("image removed: " + aktRelPos );
 			$(this).remove();
 		}
 	});
 	$('video[rel]').each(function(index) {
 		var aktRelPos = $(this).attr("rel");
-		if (aktRelPos != img && aktRelPos != gLastImagePos){
+		if (aktRelPos != img //&& aktRelPos != gLastImagePos
+			){
 			//if (console && console.log) console.log("image removed: " + aktRelPos );
 			$(this).remove();
 		}
