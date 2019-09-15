@@ -23,6 +23,17 @@ $(function() {
 			}
 		}
 		
+		var outspeed = newspeed;
+		if (newspeed == 'slow') {
+			outspeed = 600 + 200;
+		} else if (newspeed == 'normal') {
+			outspeed = 400 + 200;
+		} else if (newspeed == 'fast') {
+			outspeed = 400 + 200;
+		} else {
+			outspeed = newspeed + 200;
+		}
+		
 		// slidshow interval
 		var newinterval = parseInt($("input[name='optinterval']").val(), 10); 
 		if (isNaN(newinterval)) {
@@ -135,6 +146,7 @@ $(function() {
 		$.fn.superbgimage.options = { 
 			transition: parseInt($("#transition").val(), 10),
 			speed: newspeed,
+			outspeed: outspeed,
 			slide_interval: newinterval,
 			transitionout: parseInt(newtransitionout, 10),
 			randomtransition: parseInt(newrandomtransition, 10),

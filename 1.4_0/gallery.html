@@ -80,8 +80,8 @@
 			<input type="checkbox" name="optscaletofit" id="optscaletofit" checked="checked" title="Activate scaling image to fit into the browser window / otherwise it is scaled to fullscreen."></input><label for="optscaletofit">scale images to fit</label><br />
 			<br /><span>initial position</span><br />
 			<select name="initposition" id="initposition" title="Initial position of the next image.">
-				<option value="0" selected="selected"> 0 - center</option>
-				<option value="1"> 1 - left top</option>
+				<option value="0"> 0 - center</option>
+				<option value="1" selected="selected"> 1 - left top</option>
 				<option value="2"> 2 - right top</option>
 				<option value="3"> 3 - left bottom</option>
 				<option value="4"> 4 - right bottom</option>
@@ -93,9 +93,9 @@
 				<option value="2"> 2 - down left</option>
 				<option value="3"> 3 - down right</option>
 			</select><br /><br />
-			<input type="text" size="6" name="fpsinterval" id="fpsinterval" value="16" title="Enter the fresh interval in milliseconds, default 16"></input><label for="fpsinterval">&nbsp;fresh interval</label><br />
-			<input type="text" size="6" name="xspeed" id="xspeed" value="0.008" title="Enter horizonal speed factor, default 0.008"></input><label for="xspeed">&nbsp;horizonal speed factor</label><br />
-			<input type="text" size="6" name="yspeed" id="yspeed" value="0.0032" title="Enter vertical speed factor, default 0.0035"></input><label for="yspeed">&nbsp;vertical speed factor</label><br />
+			<input type="text" size="6" name="fpsinterval" id="fpsinterval" value="1" title="Enter the fresh interval in milliseconds, default 16"></input><label for="fpsinterval">&nbsp;fresh interval</label><br />
+			<input type="text" size="6" name="xspeed" id="xspeed" value="0.008" title="Enter speed for manual scrolling, default 0.008"></input><label for="xspeed">&nbsp;manual scroll speed</label><br />
+			<input type="text" size="6" name="yspeed" id="yspeed" value="1.0" title="Enter vertical speed factor, default 1.0"></input><label for="yspeed">&nbsp;auto scroll speed</label><br />
 		</fieldset>
 		
 		<p class="small">
