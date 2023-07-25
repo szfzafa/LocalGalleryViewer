@@ -31,7 +31,7 @@ $(function() {
 		randomtransition: 0, // 0-none, 1-use random transition (0-7)
 		showtitle: 0, // 0-none, 1-show title
 		slideshow: 1, // 0-none, 1-autostart slideshow
-		slide_interval: 4000, // interval for the slideshow
+		slide_interval: 12000, // interval for the slideshow
 		randomimage: 1, // 0-none, 1-random image
 		speed: 'slow', // animation speed
 		outspeed: 800,	
@@ -50,7 +50,7 @@ $(function() {
 		scaletofit: 2, // 0- no fitting, 1- fit image to view container
 		initposition: 1,
 		initdirection: 0,
-		fpsinterval: 1,
+		fpsinterval: 6,
 		xspeed: 0.008,
 		yspeed: 1.0
 	};
