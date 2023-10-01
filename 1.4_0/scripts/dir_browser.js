@@ -137,6 +137,41 @@ function changedir(e) {
 	}
 }
 		
+var wakeLock = null;
+function allowScreenSleep(){
+	if(wakeLock != null){
+		wakeLock.release().then(() => {
+			wakeLock = null;
+			console.log("document is " + document.visibilityState + ", release wakeLock.");
+		});
+	}
+}
+
+function keepScreenAwake(){
+	/* async () => {
+		try {
+			if(wakeLock == null){
+				//	https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Errors/Bad_await
+				//	wakeLock = await navigator.wakeLock.request("screen");
+				
+				statusElem.textContent = "Wake Lock is active!";
+				console.log("document is " + document.visibilityState + ", request wakeLock.");
+			}
+		} catch (err) {
+		// The Wake Lock request has failed - usually system related, such as battery.
+			statusElem.textContent = `${err.name}, ${err.message}`;
+		}
+	} */
+	//	https://medium.com/js-bytes/how-to-keep-your-screen-awake-using-javascript-aa15775d9bff
+	if(wakeLock == null){
+		navigator.wakeLock.request('screen')
+			.then(lock => { 
+				screenLock = lock;
+				console.log("document is " + document.visibilityState + ", request wakeLock.");
+			});
+	}
+}
+
 $(window).load(function(){
 	(function(){
 		// var files, 
@@ -158,5 +193,28 @@ $(window).load(function(){
 		//http://www.cnblogs.com/xproer/archive/2010/10/24/1859895.html
 		//但是这个需要ActiveX配合，比较麻烦
 		//http://support.myvisionexpress.com/index.php?/Knowledgebase/Article/View/444/0/how-to-activate-activex-for-google-chrome--firefox-for-single-sign-on-feature-for-rd-web-access
+		
+		//	防熄屏
+		//	https://stackoverflow.com/questions/10328665/how-to-detect-browser-minimized-and-maximized-state-in-javascript
+		//	https://developer.mozilla.org/en-US/docs/Web/API/Screen_Wake_Lock_API
+		document.addEventListener("visibilitychange", function() {
+			console.log(document.hidden, document.visibilityState);
+			if(document.hidden){
+				allowScreenSleep();
+			}
+			else{
+				keepScreenAwake();
+			}
+		}, false);
+		//	https://newsn.net/say/js-visibility-change.html
+		window.addEventListener("focus", () => {
+			console.log("focus2");
+			keepScreenAwake();
+		});
+		window.addEventListener("blur", () => {
+			console.log("blur2");
+			allowScreenSleep();
+		})
+		keepScreenAwake();
 	})();
 });
