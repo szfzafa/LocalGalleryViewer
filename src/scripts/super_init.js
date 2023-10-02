@@ -31,7 +31,7 @@ $(function() {
 		randomtransition: 0, // 0-none, 1-use random transition (0-7)
 		showtitle: 0, // 0-none, 1-show title
 		slideshow: 1, // 0-none, 1-autostart slideshow
-		slide_interval: 12000, // interval for the slideshow
+		slide_interval: 8000, // interval for the slideshow
 		randomimage: 1, // 0-none, 1-random image
 		speed: 'slow', // animation speed
 		outspeed: 800,	
@@ -50,7 +50,7 @@ $(function() {
 		scaletofit: 2, // 0- no fitting, 1- fit image to view container
 		initposition: 1,
 		initdirection: 0,
-		fpsinterval: 6,
+		fpsinterval: 7,
 		xspeed: 0.008,
 		yspeed: 1.0
 	};
@@ -93,12 +93,16 @@ function superbgimage_cleanup(img) {
 function superbgimage_show(img) {
 	$('#superbgimage').css('background', 'none');
 	$('#superbgimage').append($('#showtitle'));
-	$('#showtitle p.imagecount').html('image ' + img + ' of ' + $.superbg_imgIndex);
-	if ($('#thumbs1').css('display') == 'block') {
-		$('#showtitle p.title').html($('#thumbs1 a' + "[rel='" + img + "']").attr('title'));
-	} else {
-		$('#showtitle p.title').html($('#thumbs2 a' + "[rel='" + img + "']").attr('title'));
-	}
+	var myFile = $.myFileList[Number(img) - 1];
+	
+	//$('#showtitle p.imagecount').html('image ' + img + ' of ' + $.superbg_imgIndex);
+	$('#showtitle p.imagecount').html((myFile.isvideo ? 'video ' : 'image ') + img + ' of ' + $.superbg_imgIndex);
+	// if ($('#thumbs1').css('display') == 'block') {	//	右下角设置文件名
+		//$('#showtitle p.title').html($('#thumbs1 a' + "[rel='" + img + "']").attr('title'));
+		$('#showtitle p.title').html(myFile.title);
+	// } else {	//	thumbs2未用到
+		// $('#showtitle p.title').html($('#thumbs2 a' + "[rel='" + img + "']").attr('title'));
+	// }
 	$('#showtitle').fadeIn('fast');
 	// save last image pos
 	superbgimage_cleanup(img);
