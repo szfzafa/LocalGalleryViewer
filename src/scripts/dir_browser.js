@@ -52,7 +52,6 @@ function update_superbgControls() {
 			changeImage("#control_pause","css/media-playback-pause-3.png");
 			changeImage("#control_start","css/media-playback-start-3.png");
 			changeImage("#control_stop","css/media-playback-stop-3.png");
-
 		}
 	}
 	else{
@@ -61,7 +60,6 @@ function update_superbgControls() {
 		changeImage("#control_start","css/media-playback-start-3_inactive.png");
 		changeImage("#control_stop","css/media-playback-stop-3_inactive.png");
 		changeImage("#control_pause","css/media-playback-pause-3_inactive.png");
-	
 	}
 }
 
@@ -77,7 +75,7 @@ function changedir(e) {
 		output.innerHTML = "<legend1 class='legend1'>Image List</legend1>";
 		filecounter = 0;
 		
-		
+		$.myFileList = [];
 		for (var i = 0, file; file = files[i]; i++) {
 		  //var imageType = /image.*/;
 		  //if (!file.type.match(imageType)) {
@@ -102,11 +100,13 @@ function changedir(e) {
 		  // window.URL.createObjectURL()
 		  var fileUrl = window.URL.createObjectURL(file);
 		  //output.insertAdjacentHTML('beforeend', '<a href="' + fileUrl + '" alt="' + file.name + '" title="' + file.name + '" fileid="'+ filecounter +'" >' + (filecounter+1) +'</a>');
-			if (videoFormats.indexOf(ext) == -1){
-				output.insertAdjacentHTML('beforeend', '<a href="' + fileUrl + '" alt="' + file.name + '" title="' + file.name + '" fileid="'+ filecounter + '" isvideo="false" ext="'+ ext +'" type="'+ type +'" >' + (filecounter+1) +'</a>');
+			if (videoFormats.indexOf(ext) == -1){	//	图片
+				// output.insertAdjacentHTML('beforeend', '<a href="' + fileUrl + '" alt="' + file.name + '" title="' + file.name + '" fileid="'+ filecounter + '" isvideo="false" ext="'+ ext +'" type="'+ type +'" >' + (filecounter+1) +'</a>');
+				$.myFileList.push({href:fileUrl, title:file.name, rel:(filecounter+1), isvideo:false, ext:ext, type:type, moved:false});
 			}
-			else{
-				output.insertAdjacentHTML('beforeend', '<a href="' + fileUrl + '" alt="' + file.name + '" title="' + file.name + '" fileid="'+ filecounter + '" isvideo="true" ext="'+ ext +'" type="'+ type +'" >' + (filecounter+1) +'</a>');
+			else{	//	视频
+				// output.insertAdjacentHTML('beforeend', '<a href="' + fileUrl + '" alt="' + file.name + '" title="' + file.name + '" fileid="'+ filecounter + '" isvideo="true" ext="'+ ext +'" type="'+ type +'" >' + (filecounter+1) +'</a>');
+				$.myFileList.push({href:fileUrl, title:file.name, rel:(filecounter+1), isvideo:true, ext:ext, type:type, moved:false});
 			}
 		  
 		  filecounter++;
@@ -115,15 +115,40 @@ function changedir(e) {
 		// add: <br style="clear:both"/>
 		output.innerHTML += "<br style='clear:both' />";
 		if (filecounter > 0) update_superbgControls();
-		$('#thumbs1').superbgimage({ reload: true }).show().removeClass('hidden');
+		$('#fileURL')[0].value = '';	//	释放FileList大数组内存
+		$('#thumbs1 a').remove();
+		//$(this).parent().css('height','15px').css('padding', '0px').addClass('hidden').children().hide();
+		$(".legend1").show().css('display', 'block');
+		//$('#thumbs1').superbgimage({ reload: true }).show().removeClass('hidden');
+		$('#thumbs1').superbgimage({ reload: true }).css('height','15px').css('padding', '0px').addClass('hidden').children().hide();
+		$(".legend1").show().css('display', 'block');
 	}
 	
 	// 修复image list不能隐藏
 	$(".legend1").click(function() {
+		var output = document.getElementById("thumbs1");
 		if ($(this).parent().hasClass('hidden')) {
+			var len = $.myFileList.length;
+			if(len > 0){
+				for(var i=0; i<len; i++){
+					var myFile = $.myFileList[i];
+					output.insertAdjacentHTML('beforeend', '<a href="' + myFile.href + '" alt="' + myFile.title + '" title="' + myFile.title 
+					+ '" fileid="'+ i + '" isvideo="' + (videoFormats.indexOf(myFile.ext) >= 0) + '" ext="'+ myFile.ext +'" type="'+ myFile.type
+					+'" + rel="' + (i+1) + '" class="' + (myFile.moved ? 'moved':'preload') + '">' + (i+1) +'</a>');
+				}
+				$('#thumbs1 a').click(function() {	//	给链接添加点击逻辑，superbg_imgIndex从1开始
+					//$(this).superbgShowImage();		//	img参数undefined，这可不行，$(this)[0]为a
+					if($(this).hasClass('preload'))
+						$(this).superbgShowImage($(this).attr('rel'));
+					return false;
+				});	//.addClass('preload');
+				$('#thumbs1 a.preload[rel="' + $.superbg_imgActual + '"]').addClass('activeslide');
+			}
+			
 			$(this).parent().css('height', 'auto').css('padding', '10px').removeClass('hidden').children().show();
 			$(this).show().css('display', 'block');
 		} else {
+			$('#thumbs1 a').remove();
 			$(this).parent().css('height','15px').css('padding', '0px').addClass('hidden').children().hide();
 			$(this).show().css('display', 'block');
 		}
@@ -140,14 +165,16 @@ function changedir(e) {
 var wakeLock = null;
 function allowScreenSleep(){
 	if(wakeLock != null){
-		wakeLock.release().then(() => {
-			wakeLock = null;
-			console.log("document is " + document.visibilityState + ", release wakeLock.");
-		});
+		try {
+			wakeLock.release().then(() => {
+				wakeLock = null;
+				//	console.log("document is " + document.visibilityState + ", release wakeLock.");
+			});
+		} catch(err) {}
 	}
 }
 
-function keepScreenAwake(){
+async function keepScreenAwake(){
 	/* async () => {
 		try {
 			if(wakeLock == null){
@@ -164,11 +191,18 @@ function keepScreenAwake(){
 	} */
 	//	https://medium.com/js-bytes/how-to-keep-your-screen-awake-using-javascript-aa15775d9bff
 	if(wakeLock == null){
-		navigator.wakeLock.request('screen')
-			.then(lock => { 
-				screenLock = lock;
-				console.log("document is " + document.visibilityState + ", request wakeLock.");
-			});
+		try {
+			// navigator.wakeLock.request('screen')
+			// .then(lock => { 
+				// wakeLock = lock;
+					//	console.log("document is " + document.visibilityState + ", request wakeLock.");
+			// });
+			try {
+				screenLock = await navigator.wakeLock.request('screen');
+			} catch(err) {
+				//console.log(err.name, err.message);
+			}
+		} catch(err) {}
 	}
 }
 
@@ -198,7 +232,7 @@ $(window).load(function(){
 		//	https://stackoverflow.com/questions/10328665/how-to-detect-browser-minimized-and-maximized-state-in-javascript
 		//	https://developer.mozilla.org/en-US/docs/Web/API/Screen_Wake_Lock_API
 		document.addEventListener("visibilitychange", function() {
-			console.log(document.hidden, document.visibilityState);
+			//console.log(document.hidden, document.visibilityState);
 			if(document.hidden){
 				allowScreenSleep();
 			}
@@ -208,11 +242,11 @@ $(window).load(function(){
 		}, false);
 		//	https://newsn.net/say/js-visibility-change.html
 		window.addEventListener("focus", () => {
-			console.log("focus2");
+			//	console.log("focus2");
 			keepScreenAwake();
 		});
 		window.addEventListener("blur", () => {
-			console.log("blur2");
+			//	console.log("blur2");
 			allowScreenSleep();
 		})
 		keepScreenAwake();
