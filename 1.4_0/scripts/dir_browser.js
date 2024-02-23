@@ -1,5 +1,5 @@
 
-var imgFormats = ['png', 'bmp', 'jpeg', 'jpg', 'gif', 'png', 'svg', 'xbm', 'webp', 'webm', 'mp4'];
+var imgFormats = ['png', 'bmp', 'jpeg', 'jpg', 'gif', 'png', 'svg', 'xbm', 'webp', 'webm', 'mp4', 'avif'];
 var videoFormats = ['webm', 'mp4'];
 var filecounter = 0;
 
