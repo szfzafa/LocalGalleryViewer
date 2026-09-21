@@ -1,5 +1,4 @@
-chrome.browserAction.onClicked.addListener(function(activeTab)
-{
-    var newURL = chrome.extension.getURL('gallery.html');
-    chrome.tabs.create({ url: newURL });
+chrome.action.onClicked.addListener((activeTab) => {
+  const newURL = chrome.runtime.getURL('gallery.html');
+  chrome.tabs.create({ url: newURL });
 });

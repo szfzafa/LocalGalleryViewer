@@ -31,8 +31,8 @@ $(function() {
 		randomtransition: 0, // 0-none, 1-use random transition (0-7)
 		showtitle: 0, // 0-none, 1-show title
 		slideshow: 1, // 0-none, 1-autostart slideshow
-		slide_interval: 8000, // interval for the slideshow
-		randomimage: 1, // 0-none, 1-random image
+		slide_interval: 5000, // interval for the slideshow
+		randomimage: 0, // 0-none, 1-random image
 		speed: 'slow', // animation speed
 		outspeed: 800,	
 		preload: 0, // 0-none, 1-preload images
