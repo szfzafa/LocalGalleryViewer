@@ -87,12 +87,12 @@ $(function() {
 		// onclick-callback
 		if ($("input[name='optclick']:checked").val() == 'on') {
 			onclickfunc = superbgimage_click;
-			$('#superbgimage img').each(function() { // add click-callback to all images
+			$('#superbgimage img,video,canvas').each(function() { // add click-callback to all images
 				$(this).unbind('click').click(function(){ superbgimage_click($(this).attr('rel')); });
 			});	
 		} else {
 			onclickfunc = null;
-			$('#superbgimage img').each(function() { // remove click-callback from all images
+			$('#superbgimage img,video,canvas').each(function() { // remove click-callback from all images
 				$(this).unbind('click');
 			});	
 		}
