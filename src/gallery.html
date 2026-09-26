@@ -4,28 +4,28 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Script-Type" content="text/javascript" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
-
 	<title>localGalleryViewerExtension Gallery Window</title>
  
 	<link type="text/css" href="css/styles.css" media="screen" rel="stylesheet" />
-    <script type='text/javascript' src='scripts/jquery.min.js'></script>
+    
+
+	<script type='text/javascript' src='scripts/jquery.min.js'></script>
   	<script type="text/javascript" src="scripts/jquery.effects.core.min.js"></script>
 	<script type="text/javascript" src="scripts/jquery.effects.slide.min.js"></script>
 	<script type="text/javascript" src="scripts/jquery.effects.blind.min.js"></script>
 	<script type="text/javascript" src="scripts/jquery.superbgimage.min.js"></script>
 	<script type="text/javascript" src="scripts/super_init.js"></script>
+	<!-- 新增：配置持久化模块，必须放在jquery之前 -->
+	<script type="text/javascript" src="scripts/config_storage.js"></script>
 	<script type="text/javascript" src="scripts/super_runtime.js"></script>
-	<script type='text/javascript' src='scripts/dir_browser.js'></script>
-		<!-- 新增 worker，注意路径：如果worker.js放在scripts文件夹，则写 scripts/worker.js -->
+	<script type='text/javascript' src="scripts/dir_browser.js"></script>
+	<!-- 新增 worker，注意路径：如果worker.js放在scripts文件夹，则写 scripts/worker.js -->
 	<script type="text/javascript" src="scripts/worker.js"></script>
-
-
+	<!-- ✅新增：迁移后的原内联脚本，外部独立js，解决CSP报错 -->
+	<script type="text/javascript" src="scripts/gallery_inline.js"></script>
 </head>
-
 <body>
-
 	<div id="overlay">
-
 		<h1 title="Click to hide the control panel. It will fade out as soon as you move the mouse cursor out."><a href="#">localGalleryViewerExtension Gallery Window</a></h1>
 		
 		<fieldset id="control">
@@ -48,11 +48,11 @@
 		
 		<fieldset id="thumbs1">
 			<legend1 class="legend1">Image List</legend1>
-			<br style="clear:both"/>
+			<br style="clear:both" />
 		</fieldset>
 		<fieldset id="thumbs2">
 			<legend1 class="legend1">select image (set 2)</legend1>			
-			<br style="clear:both"/>
+			<br style="clear:both" />
 		</fieldset>
 		
 		<fieldset id="options">
@@ -98,6 +98,10 @@
 			<input type="text" size="6" name="fpsinterval" id="fpsinterval" value="7" title="Enter the fresh interval in milliseconds, default 16"></input><label for="fpsinterval">&nbsp;fresh interval</label><br />
 			<input type="text" size="6" name="xspeed" id="xspeed" value="0.008" title="Enter speed for manual scrolling, default 0.008"></input><label for="xspeed">&nbsp;manual scroll speed</label><br />
 			<input type="text" size="6" name="yspeed" id="yspeed" value="1.0" title="Enter vertical speed factor, default 1.0"></input><label for="yspeed">&nbsp;auto scroll speed</label><br />
+
+            <!-- =====新增Save按钮===== -->
+			<br>
+			<button id="btnSaveCfg">Save 保存配置</button>
 		</fieldset>
 		
 		<p class="small">
@@ -118,6 +122,6 @@
 		 <p class="imagecount small">no current image</p>
 		 <p class="title"></p>
 	</div>
-	
+
 </body>
 </html>
