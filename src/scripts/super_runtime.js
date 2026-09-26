@@ -1,7 +1,35 @@
 $(function() {
+    // 唯一真值源，闭包私有
+    let realScaletofit = 2;
 
+    // UI复用函数：仅本闭包内部调用，不暴露给外部脚本
+    function syncScaleToFitUi(){
+        const $cb = $('input[name="optscaletofit"]');
+        if($cb.length === 0) return;
+        const val = realScaletofit;
+        if(val === 0){
+            $cb.prop('checked', false).css('opacity',1);
+        }else if(val === 1){
+            $cb.prop('checked', true).css('opacity',0.5);
+        }else if(val === 2){
+            $cb.prop('checked', true).css('opacity',1);
+        }
+    }
 
+    // 对外仅暴露读取接口，供gallery_inline Save按钮拿数值
+    window.getRealScaletofit = function(){
+        return realScaletofit;
+    };
 
+    // ========== 修复点 START ==========
+    // 初始化：读取localStorage，回填DOM表单，再赋值realScaletofit
+    let userCfg = {};
+    if(typeof loadUserOptions === "function"){
+        userCfg = loadUserOptions();
+        fillOptionsToDom(userCfg); // 【关键】先把全部配置刷到表单DOM
+        realScaletofit = Number(userCfg.scaletofit);
+    }
+    // ========== 修复点 END ==========
 	// update superbgimage options
 	function update_superbgOptions() {
 
@@ -109,25 +137,7 @@ $(function() {
 		*/
 
 		// image scaletofit
-		var newscaletofit = 0;
-		if ($("input[name='optscaletofit']:checked").val() == 'on') {
-			newscaletofit = 1;	//勾选后肯定为1
-			$("input[name='optscaletofit']").css('opacity',0.5);
-		} else {
-			newscaletofit = $.fn.superbgimage.options.scaletofit;
-			if(newscaletofit >= 2)	//去勾选
-			{
-				newscaletofit = 0;
-				$("input[name='optscaletofit']").prop('checked', false);
-				$("input[name='optscaletofit']").css('opacity',1);
-			}
-			else	//屏蔽去勾选
-			{
-				newscaletofit += 1;
-				$("input[name='optscaletofit']").prop('checked', true);
-				$("input[name='optscaletofit']").css('opacity',1);
-			}
-		}
+		// scaletofit：直接取自闭包私有真值，不从DOM/插件options读取
 		
 		// update options
 		/*
@@ -152,7 +162,7 @@ $(function() {
 			randomtransition: parseInt(newrandomtransition, 10),
 			randomimage: parseInt(newrandomimage, 10),
 			onClick: onclickfunc,
-			scaletofit: parseInt(newscaletofit, 10),
+			scaletofit: parseInt(realScaletofit, 10),
 			initposition: parseInt($("#initposition").val(), 10),
 			initdirection: parseInt($("#initdirection").val(), 10),
 			fpsinterval: parseInt($("input[name='fpsinterval']").val(), 10),
@@ -338,7 +348,9 @@ $(function() {
 	});		
 
 	// change option scaletofit
+	// scale复选框点击轮转
 	$("input[name='optscaletofit']").click(function() {
+		realScaletofit = (realScaletofit + 1) % 3;
 		update_superbgOptions();
 		// var bufpos = $.superbg_imgActual;
 		// var bufpos_showimage = $.fn.superbgimage.options.showimage;
@@ -360,6 +372,10 @@ $(function() {
 		afa_zoom_old = 1.0;
 		afa_imageload = true;
 		$(this).superbgResize();
+
+		setTimeout(function(){
+			syncScaleToFitUi(); // 调用复用函数
+		},0);
 	});		
 	
 	// toggle fieldsets
@@ -390,5 +406,15 @@ $(function() {
 		}
 		return false;
 	});	
-	
+
+	// 全部绑定完毕，灌入插件options
+	update_superbgOptions();
+
+	// 页面load，本闭包内部调用UI同步，修正HTML静态checked
+	$(window).on("load",function(){
+		setTimeout(function(){
+			syncScaleToFitUi();
+		},0);
+	});
+
 });
