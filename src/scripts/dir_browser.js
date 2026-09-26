@@ -102,11 +102,11 @@ function changedir(e) {
 		  //output.insertAdjacentHTML('beforeend', '<a href="' + fileUrl + '" alt="' + file.name + '" title="' + file.name + '" fileid="'+ filecounter +'" >' + (filecounter+1) +'</a>');
 			if (videoFormats.indexOf(ext) == -1){	//	图片
 				// output.insertAdjacentHTML('beforeend', '<a href="' + fileUrl + '" alt="' + file.name + '" title="' + file.name + '" fileid="'+ filecounter + '" isvideo="false" ext="'+ ext +'" type="'+ type +'" >' + (filecounter+1) +'</a>');
-				$.myFileList.push({href:fileUrl, title:file.name, rel:(filecounter+1), isvideo:false, ext:ext, type:type, moved:false});
+				$.myFileList.push({href:fileUrl, title:file.name, rel:(filecounter+1), imgType:-1, fileSize:file.size, rawFile: file, ext:ext, type:type, moved:false});
 			}
 			else{	//	视频
 				// output.insertAdjacentHTML('beforeend', '<a href="' + fileUrl + '" alt="' + file.name + '" title="' + file.name + '" fileid="'+ filecounter + '" isvideo="true" ext="'+ ext +'" type="'+ type +'" >' + (filecounter+1) +'</a>');
-				$.myFileList.push({href:fileUrl, title:file.name, rel:(filecounter+1), isvideo:true, ext:ext, type:type, moved:false});
+				$.myFileList.push({href:fileUrl, title:file.name, rel:(filecounter+1), imgType:0, fileSize:file.size, rawFile: file, ext:ext, type:type, moved:false});
 			}
 		  
 		  filecounter++;
@@ -118,7 +118,7 @@ function changedir(e) {
 		$('#fileURL')[0].value = '';	//	释放FileList大数组内存
 		$('#thumbs1 a').remove();
 		//$(this).parent().css('height','15px').css('padding', '0px').addClass('hidden').children().hide();
-		$(".legend1").show().css('display', 'block');
+		$(".legend1").show().css('display','block');
 		//$('#thumbs1').superbgimage({ reload: true }).show().removeClass('hidden');
 		$('#thumbs1').superbgimage({ reload: true }).css('height','15px').css('padding', '0px').addClass('hidden').children().hide();
 		$(".legend1").show().css('display', 'block');
@@ -133,8 +133,8 @@ function changedir(e) {
 				for(var i=0; i<len; i++){
 					var myFile = $.myFileList[i];
 					output.insertAdjacentHTML('beforeend', '<a href="' + myFile.href + '" alt="' + myFile.title + '" title="' + myFile.title 
-					+ '" fileid="'+ i + '" isvideo="' + (videoFormats.indexOf(myFile.ext) >= 0) + '" ext="'+ myFile.ext +'" type="'+ myFile.type
-					+'" + rel="' + (i+1) + '" class="' + (myFile.moved ? 'moved':'preload') + '">' + (i+1) +'</a>');
+					+ '" fileid="'+ i + '" data-imgtype="' + myFile.imgType + '" data-filesize="' + myFile.fileSize + '" ext="'+ myFile.ext +'" type="'+ myFile.type
+					+'" rel="' + (i+1) + '" class="' + (myFile.moved ? 'moved':'preload') + '">' + (i+1) +'</a>');
 				}
 				$('#thumbs1 a').click(function() {	//	给链接添加点击逻辑，superbg_imgIndex从1开始
 					//$(this).superbgShowImage();		//	img参数undefined，这可不行，$(this)[0]为a

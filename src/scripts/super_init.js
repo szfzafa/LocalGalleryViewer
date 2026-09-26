@@ -86,8 +86,13 @@ function superbgimage_cleanup(img) {
 			$(this).remove();
 		}
 	});
+    $('canvas[rel]').each(function(index) {
+		var aktRelPos = $(this).attr("rel");
+		if (aktRelPos != img){
+			$(this).remove();
+		}
+	});
 }
-
 // function callback on showing image
 // get title and display it
 function superbgimage_show(img) {
@@ -96,7 +101,7 @@ function superbgimage_show(img) {
 	var myFile = $.myFileList[Number(img) - 1];
 	
 	//$('#showtitle p.imagecount').html('image ' + img + ' of ' + $.superbg_imgIndex);
-	$('#showtitle p.imagecount').html((myFile.isvideo ? 'video ' : 'image ') + img + ' of ' + $.superbg_imgIndex);
+	$('#showtitle p.imagecount').html((myFile.imgType === 0 ? 'video ' : 'image ') + img + ' of ' + $.superbg_imgIndex);
 	// if ($('#thumbs1').css('display') == 'block') {	//	右下角设置文件名
 		//$('#showtitle p.title').html($('#thumbs1 a' + "[rel='" + img + "']").attr('title'));
 		$('#showtitle p.title').html(myFile.title);
