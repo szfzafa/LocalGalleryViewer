@@ -112,9 +112,15 @@ async function checkAnimated(rel, file) {
 
 async function decodeBitmap(rel, file) {
     try {
+        // const t0 = Math.round(performance.now());
         const bitmap = await createImageBitmap(file);
+        // const t1 = Math.round(performance.now());
+        // const cost = t1 - t0;
+        // console.log(`[WORKER-DECODE][${t0}][DONE] rel=${rel}, cost=${cost}ms`);
         return { bitmap: bitmap, error: false };
     } catch (e) {
+        // const t0 = Math.round(performance.now());
+        // console.log(`[WORKER-DECODE][${t0}][FAIL] rel=${rel}`);
         return { bitmap: null, error: true };
     }
 }
