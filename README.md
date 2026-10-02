@@ -2,62 +2,61 @@
 some personal customizations based on localGalleryViewer Chrome Extension originally by Andreas Meyer
 https://chrome.google.com/webstore/detail/localgalleryviewerextensi/opheklanmaieaeneebdohfpbjkhcgilk
 引用请保留以上来源出处，请遵从Chrome扩展及原作者保留使用许可，使用后果自负
-其实我啥也不会，就是改改js方便自己看图，许可授权什么的都没有，这里只是归档一下代码
 
-在localGalleryViewerExtension 1.4基础上，
-新增特性：
+> 基于 localGalleryViewerExtension 1.4 深度二次修改
+> 使用浏览器 File System Access API 直接完成本地文件移动操作
+> 仅归档个人自用，无正式许可。
 
-·放缩模式scalefit增强：
-自动放大图片并自动滚动，这个超好用的，解放双手，方便哪啥……你懂得
-scale image to fit选项：
-去勾选：scalefit=0 图片自动放缩到不需要移动就能展示全图（竖图显示全部高度，横图显示全部宽度）
-灰化：scalefit=1 图片自动放缩到只需要移动一个方向就能浏览全部画面（竖图显示全部宽度，横图显示全部高度）
-勾选：scalefit=2 图片自动放缩到只需要移动一个方向就能浏览全部画面，同时自动滚动（竖图显示全部宽度并自动上下滚动，横图显示全部高度并自动左右滚动）
-其中自动滚动还加了5个参数控制：
-初始位置：中央 或紧贴上下左右边框
-初始移动方向：先往上下左右哪个方向滚动
-刷新率：两次绘图间隔时间，毫秒，60帧屏幕用16ms就够了；越大滚动动画越不流畅
-水平/垂直速率：配合刷新率用，越大滚动越快
+## 使用方法
+### 扩展本体
+1. 调试：chrome加载已解压扩展，打开gallery.html，control面板选择目录（支持拖拽文件夹）
+2. 推荐启动参数（kiosk大屏）
+chrome.exe --enable-easy-off-store-extension-install -kiosk chrome-extension:// 扩展 ID/gallery.html
 
-·图片控制：
-暂停：单击左键控制幻灯片是暂停还是自动播放
-上一个下一个：键盘左右键
-滚轮缩放：以鼠标当前坐标为中心缩放图片，滚轮上为放大，滚轮下为缩小
-手动滚动：将鼠标移动到屏幕边缘，屏幕会向对应方向滚动；或者也可以按住鼠标左键拖动图片
-中键：恢复初始位置和缩放
-右键：取消自动滚动，用于查看图片细节（需要设置chrome通过kiosk参数运行才能生效，否则右键还是浏览器默认的右键菜单，例如"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --enable-easy-off-store-extension-install -kiosk chrome-extension://扩展的id/gallery.html）
+## 新增特性
+·缩放模式 scalefit增强：
+自动放大图片并自动滚动
+- scalefit=0：不勾选；适配视图完整展示整张图
+- scalefit=1：半透明勾选；单方向滚动即可浏览全图
+- scalefit=2：完全勾选；单方向滚动+自动往复滚动；配套参数：初始位置、初始方向、刷新率、水平/垂直滚动速率
+（transition fade由旧图fadeOut改为新图fadeIn）
 
-·更多文件格式：
-支持多种图片和视频格式，视频播放时间不低于幻灯时间
-扩展名：png（不支持apng动图）, bmp, jpeg, jpg, gif（不支持按动画时间播放）, svg, xbm, webp
-视频：webm, mp4（常上那啥站的都知道有好多小视频，其实有的也不小，fapheroes、海通信什么的）
+·图片交互
+- 鼠标左键单击：暂停/继续幻灯片
+- 键盘 ← →：上一张、下一张
+- 鼠标滚轮缩放：以鼠标点为缩放中心
+- 鼠标移至屏幕边缘触发滚动；支持左键拖拽图片
+- 鼠标中键：重置缩放与位置
+- 右键：取消自动滚动（仅kiosk模式下生效）
 
-·辅助分类或删除：
-一个目录有很多图，有的图需要移走或删除，可以边看边删，需要AutoIt配合
-先在图片目录下新建名为0~9或DEL的目录，运行AutoIt脚本，对当前图片按0~9数字键或DEL，该文件会被自动移动到相应子目录下，方便分类处理，已经挪走的图片在列表中会被置灰
+·媒体格式
+支持图片：png、bmp、jpeg、jpg、gif、svg、xbm、webp
+支持视频：webm、mp4；幻灯片间隔时长不低于视频本身时长
 
+·本地文件按快捷键分拣（键盘0‑9 / DEL）
+0～9：将图片移动到**该图片所在目录下**对应的数字子文件夹；子文件夹不存在会自动创建
+DEL：将图片移动到**打开的根目录下 `_TRASH_` 回收站目录；不会物理删除文件
+已移动图片缩略图置灰+删除线标记、过滤，上下一张仅遍历有效图片
+浏览器版本需支持File Access API
 
-使用方法：
-插件本体：
-安装crx：手动下载crx文件，打开chrome或opera扩展程序管理，将crx文件拖动到浏览器确认安装并启用
-本地调试：下载1.4_0目录，用chrome或opera加载已解压的扩展程序，打开插件页面左上角control选择目录
-推荐使用chrome最新版本kiosk大屏投影模式，例如：
-"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --enable-easy-off-store-extension-install -kiosk chrome-extension://扩展的id/gallery.html
+·性能优化
+- WebWorker 大图（2MB以上）预解码，减轻主线程卡顿
+- canvas对象池复用，减少重复开销
+- 防休眠熄屏
 
-AutoIt（可选）：
-编译依赖UIAWrappers.au3库，编译运行chrome_alert.au3或自行打包；如果不需要移动或删除图片也无须运行
+## 变更
+manifest V2已升至V3
 
-
-已知问题：
-·图片宽高比接近屏幕，但竖图比屏幕只是略高、横图比屏幕只是略宽，自动滚动会有些鬼畜——暂停或看下一张吧，懒得改
-·修改设置后scalefit会自动变为灰化状态——懒得定位改，你自己点一下吧
-·scalefit=2时不能手动滚动或拖动——代码改乱了，我都不知道怎么改..
-·自动滚动只支持none、fade两种transition，其他transition坐标会错乱——懒得改了
-·自动滚动速率不平滑，动画效果会受用户机器性能影响——懒得改了，重写绘图算法太麻烦
-·自动滚动有一定的CPU利用率——没办法，目前只能通过增大绘图刷新周期规避
-·随机模式下察看上一个图不对——懒得改
-·有垂直同步问题，图片滚动时有明显撕裂——软件上似乎无解，只能靠用户硬件设置开启垂直同步
-·操作本地文件方法很土，还要依赖AutoIt——这个我真不会做，js貌似出于安全设计不允许删改本地文件，你行你来改吧
-·按数字键或DEL会弹窗——目前没做开关控制，请无视
-·有时插件会随机挂死——在切换设置时容易遇到，但设置好后一般不会挂
-·移动设备拍摄的图片不会自动旋转等——原版有的问题我也不知道咋搞哈
+## 已知问题
+1. 图片宽高比接近窗口时，自动滚动动画可能会鬼畜抖动；请暂停或切图
+2. 修改配置后scalefit状态UI需要手动确认
+3. scalefit=2自动滚动仅支持transition `none/fade`，其余转场会坐标错乱
+4. 自动滚动存在CPU开销，调高fpsinterval可降低负载
+5. 随机模式下上一张图片也是随机，并非后退
+6. 垂直同步问题，动画中画面撕裂；需显示器、显卡支持并开启硬件垂直同步
+7. 加载文件后控件输入框修改数字，按键仍然会触发文件移动——请在加载文件前修改设置
+8. EXIF旋转（多为移动设备拍摄）不会自动处理，继承原版遗留问题
+9. gif等动图动画时长超幻灯片间隔时动画会播放不全，因其时长难以获取，幻灯片间隔时间只能保持默认不变
+10. FileSystemAccess写权限限制；部分环境无法新建文件夹、移动文件，按键仅控制台警告，无弹窗报错
+11. 移动后内存列表不会自动更新parentDirHandle；需要重新扫描目录刷新句柄
+12. _TRASH_目录存在同名文件移动会报错，浏览器API不会自动重命名覆盖
