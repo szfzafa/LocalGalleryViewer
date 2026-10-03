@@ -2,6 +2,12 @@ var imgFormats = ['png', 'bmp', 'jpeg', 'jpg', 'gif', 'png', 'svg', 'xbm', 'webp
 var videoFormats = ['webm', 'mp4'];
 var filecounter = 0;
 var g_selectedDirHandle = null;
+/**
+ * 标记本次唤起input是什么模式：
+ * 'folder' = PC webkitdirectory选文件夹（覆盖）
+ * 'files' = 移动OS普通多选文件（追加）
+ */
+var g_inputSelectMode = 'folder';
 
 /**
  * 更新UI选择状态：【界面只显示文件数量，不显示目录名】
@@ -11,18 +17,15 @@ var g_selectedDirHandle = null;
 function updateSelectStatus(count, dirName) {
 	const statusEl = document.getElementById('selectStatusText');
 	if (!statusEl) return;
-	if (!dirName || count <= 0) {
+	if (count <= 0) {
 		statusEl.textContent = "No file chosen";
 	} else {
-		// UI只输出计数，删掉目录名展示
-		statusEl.textContent = `${count} file${count>1?'s':''} chosen`;
+		statusEl.textContent = `${count} file${count>1?'s':''} chosen${!dirName?'':(' in '+dirName)}`;
 	}
 }
-
 function changeImage(elem, img) {
 	$(elem).attr("src", img);
 }
-
 function changeBackgroundStyle() {
 	var bg_color = localStorage["background_color"];
 	if (!bg_color) {
@@ -41,7 +44,6 @@ function changeBackgroundStyle() {
 	}
 	$('body').css('background', newbackground);
 }
-
 function update_superbgControls() {
 	if (filecounter > 0) {
 		changeImage("#control_back", "css/media-seek-backward-3.png");
@@ -73,39 +75,71 @@ function update_superbgControls() {
 }
 
 /**
- * changedir 支持两种入参
- * 1. Event对象(FileList降级)
- * 2. FileSystemDirectoryHandle（picker / drop）
+ * 简单判断是否移动OS 但移动端浏览器选电脑版时伪装为Linux会误判
+ * @returns {boolean}
+ */
+function isMobileOS(){
+	const ua = navigator.userAgent.toLowerCase();
+	return /android|iphone|ipad|ipod|openharmony/.test(ua);
+}
+
+/**
+ * changedir 两个入参分支
+ * 1. Event对象(input FileList)：行为由 g_inputSelectMode 控制
+ *      mode='folder' → PC webkitdirectory选文件夹，覆盖全部列表
+ *      mode='files'  → 移动端普通多选，追加到现有列表
+ * 2. FileSystemDirectoryHandle(showDirectoryPicker/drop)：永远覆盖全部列表
  */
 async function changedir(arg) {
 	var output = document.getElementById("thumbs1");
 	var parsesubfolder = $("input[name='parsesubfolders']:checked").val() == 'on';
 
+	// --------分支A：来自 input 文件选择 Event--------
 	if (arg instanceof Event) {
 		var files = arg.target.files;
 		if (files.length > 0) {
 			$('#thumbs1').stopSlideShow();
-			output.innerHTML = "<legend1 class='legend1'>Image List</legend1>";
-			filecounter = 0;
-			$.myFileList = [];
-			g_selectedDirHandle = null;
 
+			if(g_inputSelectMode === 'folder'){
+				// PC选文件夹模式：清空，覆盖原有列表
+				output.innerHTML = "<legend1 class='legend1'>Image List</legend1>";
+				filecounter = 0;
+				$.myFileList = [];
+				g_selectedDirHandle = null;
+			}else{
+				// 移动端追加模式：不清空，只置空目录句柄
+				if(g_selectedDirHandle !== null){
+					g_selectedDirHandle = null;
+				}
+			}
+
+			// 循环本次选中全部File
 			for (var i = 0, file; file = files[i]; i++) {
 				var filename = file.name;
 				var type = file.type;
 				var webkitpath = file.webkitRelativePath;
+
+				// 子目录路径层级计数
 				var subpathcount = webkitpath.split("/").length - 1;
 				if (false == parsesubfolder && subpathcount > 1) {
 					continue;
 				}
+
+				// 提取小写文件后缀名 【修复语法错误的关键行】
 				var ext = filename.substr(filename.lastIndexOf('.') + 1).toLowerCase();
+
+				// 不在图片/视频格式列表则跳过
 				if (imgFormats.indexOf(ext) == -1) {
 					continue;
 				}
+				// 极小损坏文件跳过，不alert
 				if (file.size <= 32) {
-					alert("LocalGalleryViewerExtension_cmd?" + file.name + "?broken");
 					continue;
 				}
+				// 简单去重：文件名+文件大小
+				const exists = $.myFileList.some(item=> item.title === filename && item.fileSize === file.size);
+				if(exists) continue;
+
 				var fileUrl = window.URL.createObjectURL(file);
 				$.myFileList.push({
 					href: fileUrl, title: file.name, rel: (filecounter + 1),
@@ -119,6 +153,7 @@ async function changedir(arg) {
 			updateSelectStatus(filecounter, null);
 		}
 	}
+	// --------分支B：来自目录句柄 showDirectoryPicker / drop--------
 	else if (typeof arg === "object" && arg !== null && arg.kind === "directory") {
 		const dirHandle = arg;
 		$('#thumbs1').stopSlideShow();
@@ -126,9 +161,9 @@ async function changedir(arg) {
 		filecounter = 0;
 		$.myFileList = [];
 		g_selectedDirHandle = dirHandle;
-
 		console.log("[DIR‑SCAN] 开始扫描目录：", dirHandle.name);
 
+		// 递归扫描子目录
 		async function scanDirectory(currentDirHandle, relPath) {
 			for await (const [name, entry] of currentDirHandle.entries()) {
 				if (entry.kind === "directory") {
@@ -138,12 +173,12 @@ async function changedir(arg) {
 					continue;
 				}
 				if (entry.kind !== "file") continue;
-				const ext = name.substr(name.lastIndexOf('.') + 1).toLowerCase();
+
+				var ext = name.substr(name.lastIndexOf('.') + 1).toLowerCase();
 				if (imgFormats.indexOf(ext) === -1) continue;
 
 				const file = await entry.getFile();
 				if (file.size <= 32) {
-					alert("LocalGalleryViewerExtension_cmd?" + file.name + "?broken");
 					continue;
 				}
 				const fileUrl = window.URL.createObjectURL(file);
@@ -166,16 +201,16 @@ async function changedir(arg) {
 		await scanDirectory(dirHandle, "");
 		console.log("[DIR‑SCAN] 目录扫描完成：", dirHandle.name, "共找到媒体文件：", filecounter);
 		updateSelectStatus(filecounter, dirHandle.name);
+		$('#fileURL')[0].value = '';
 	}
 
+	// --------通用后续UI渲染逻辑，两个分支都会走到这里--------
 	output.innerHTML += "<br style='clear:both' />";
 	if (filecounter > 0) update_superbgControls();
-	$('#fileURL')[0].value = '';
 	$('#thumbs1 a').remove();
 	$(".legend1").show().css('display', 'block');
 	$('#thumbs1').superbgimage({ reload: true }).css('height', '15px').css('padding', '0px').addClass('hidden').children().hide();
 	$(".legend1").show().css('display', 'block');
-
 	$(".legend1").off('click').click(function () {
 		var output = document.getElementById("thumbs1");
 		if ($(this).parent().hasClass('hidden')) {
@@ -202,9 +237,8 @@ async function changedir(arg) {
 			$(this).show().css('display', 'block');
 		}
 	});
-
 	if (!$("#overlay").hasClass('hidden')) {
-		$("#overlay").css('height', '68px').addClass('hidden').children().hide();
+		$("#overlay").css('height', '68px').addClass('hidden').children().hide().end().fadeTo('slow',0.0);
 		$("h1").show();
 	}
 }
@@ -222,7 +256,7 @@ function allowScreenSleep() {
 async function keepScreenAwake() {
 	if (wakeLock == null) {
 		try {
-			screenLock = await navigator.wakeLock.request('screen');
+			wakeLock = await navigator.wakeLock.request('screen');
 		} catch (err) {
 		}
 	}
@@ -233,63 +267,77 @@ $(window).load(function () {
 		var input = document.getElementById("fileURL");
 		var pickWrapper = document.getElementById("dirPickWrapper");
 		var dropZoneElem = document.querySelector(".dropzone");
-
 		changeBackgroundStyle();
 
-		// =========点击事件：按钮、状态文字均可点击=========
 		if (pickWrapper) {
-			pickWrapper.addEventListener("click", async function (ev) {
+			pickWrapper.addEventListener("click", function (ev) {
 				ev.preventDefault();
-				if (window.showDirectoryPicker) {
-					try {
-						const dirHandle = await window.showDirectoryPicker({ mode: "readwrite" });
-						console.log("[INPUT‑CLICK‑PICKER] got dirHandle:", dirHandle);
-						await changedir(dirHandle);
-					} catch (err) {
-						if (err.name !== "AbortError") {
-							console.error("showDirectoryPicker error:", err);
+				const mobile = isMobileOS();
+
+				if(mobile){
+					input.removeAttribute('webkitdirectory');
+					g_inputSelectMode = 'files';
+				}else{
+					input.setAttribute('webkitdirectory','');
+					g_inputSelectMode = 'folder';
+				}
+
+				if (typeof window.showDirectoryPicker === "function") {
+					(async function(){
+						try {
+							const dirHandle = await window.showDirectoryPicker({ mode: "readwrite" });
+							console.log("[INPUT‑CLICK‑PICKER] got dirHandle:", dirHandle);
+							await changedir(dirHandle);
+						} catch (err) {
+							if (err.name !== "AbortError") {
+								console.error("showDirectoryPicker error:", err);
+							}
 						}
-					}
+					})();
 				} else {
-					console.warn("[FALLBACK] browser not support FileSystem Access, use native file input");
-					const onNativeChange = async function (evt) {
+					console.warn("[FALLBACK] showDirectoryPicker not available, use native file input");
+					let fired = false;
+
+					async function onNativeChange(evt){
+						if(fired) return;
+						fired = true;
+						input.removeEventListener("change", onNativeChange);
+						input.removeEventListener("input", onNativeChange);
 						try {
 							await changedir(evt);
 						} catch (e) {
 							console.error("fallback changedir error:", e);
 						}
-					};
-					input.addEventListener("change", onNativeChange, { once: true });
+					}
+					input.removeEventListener("change", onNativeChange);
+					input.removeEventListener("input", onNativeChange);
+					input.addEventListener("change", onNativeChange);
+					input.addEventListener("input", onNativeChange);
+
 					input.click();
 				}
 			});
 		}
 
-		// =========唯一拖拽注册点：dropzone，不做冒泡事件监听、无计数器==========
 		if (dropZoneElem) {
 			dropZoneElem.addEventListener("dragover", function (e) {
-				e.preventDefault(); //开启本容器drop能力
-				// 判断当前拖拽目标是否在pickWrapper内，控制高亮
+				e.preventDefault();
 				if (pickWrapper && pickWrapper.contains(e.target)) {
 					pickWrapper.classList.add('drag-hover');
 				} else {
 					pickWrapper.classList.remove('drag-hover');
 				}
 			});
-
 			dropZoneElem.addEventListener("dragleave", function () {
 				pickWrapper.classList.remove('drag-hover');
 			});
-
 			dropZoneElem.addEventListener("drop", async function (e) {
 				e.preventDefault();
 				pickWrapper.classList.remove('drag-hover');
-
 				const items = [...e.dataTransfer.items];
 				const handlePromises = items
 					.filter(it => it.kind === 'file')
 					.map(it => it.getAsFileSystemHandle());
-
 				const handles = await Promise.all(handlePromises);
 				for (const h of handles) {
 					if (h && h.kind === "directory") {
@@ -301,7 +349,6 @@ $(window).load(function () {
 			});
 		}
 
-		// 屏幕休眠逻辑不变
 		document.addEventListener("visibilitychange", function () {
 			if (document.hidden) {
 				allowScreenSleep();
@@ -319,4 +366,3 @@ $(window).load(function () {
 		keepScreenAwake();
 	})();
 });
-

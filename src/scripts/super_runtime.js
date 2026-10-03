@@ -393,7 +393,7 @@ $(function() {
 	$("h1 a").click(function() {
 		$(this).blur();
 		if ($("#overlay").hasClass('hidden')) {
-			$("#overlay").css('height','auto').removeClass('hidden').children().show();
+			$("#overlay").css('height','auto').removeClass('hidden').children().show().end().fadeTo(0,0.75);
 			// if ($('#thumbs1').hasClass('hidden')) {
 				// $('#thumbs1').hide();
 			// }
@@ -401,7 +401,7 @@ $(function() {
 				$('#thumbs2').hide();
 			}
 		} else {
-			$("#overlay").css('height','68px').addClass('hidden').children().hide();
+			$("#overlay").css('height','68px').addClass('hidden').children().hide().end().fadeTo('slow',0.00);
 			$("h1").show();
 		}
 		return false;
