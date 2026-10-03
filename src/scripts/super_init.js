@@ -1,3 +1,10 @@
+/**
+ * LocalGalleryViewer
+ * Further modifications based on SuperBGimage / localGalleryViewerExtension
+ * Copyright (c) 2026 szfzafa
+ * Licensed under Creative Commons Attribution 3.0 Unported (CC‑BY‑3.0)
+ * https://creativecommons.org/licenses/by/3.0/
+ */
 afa_zoom = 1.0;
 afa_zoom_old = 1.0;
 afa_imageload = true;

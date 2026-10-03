@@ -1,3 +1,10 @@
+/**
+ * LocalGalleryViewer
+ * Further modifications based on SuperBGimage / localGalleryViewerExtension
+ * Copyright (c) 2026 szfzafa
+ * Licensed under Creative Commons Attribution 3.0 Unported (CC‑BY‑3.0)
+ * https://creativecommons.org/licenses/by/3.0/
+ */
 $(function() {
     // 唯一真值源，闭包私有
     let realScaletofit = 2;
@@ -393,7 +400,7 @@ $(function() {
 	$("h1 a").click(function() {
 		$(this).blur();
 		if ($("#overlay").hasClass('hidden')) {
-			$("#overlay").css('height','auto').removeClass('hidden').children().show();
+			$("#overlay").css('height','auto').removeClass('hidden').children().show().end().fadeTo(0,0.75);
 			// if ($('#thumbs1').hasClass('hidden')) {
 				// $('#thumbs1').hide();
 			// }
@@ -401,7 +408,7 @@ $(function() {
 				$('#thumbs2').hide();
 			}
 		} else {
-			$("#overlay").css('height','68px').addClass('hidden').children().hide();
+			$("#overlay").css('height','68px').addClass('hidden').children().hide().end().fadeTo('slow',0.00);
 			$("h1").show();
 		}
 		return false;
