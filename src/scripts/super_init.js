@@ -99,6 +99,7 @@ function superbgimage_cleanup(img) {
 			$(this).remove();
 		}
 	});
+	$('#superbgimage #fxWrapper:empty').remove();	//	删除jQuery动画残留孤儿DOM
 }
 // function callback on showing image
 // get title and display it
@@ -117,8 +118,9 @@ function superbgimage_show(img) {
 	// }
 	$('#showtitle').fadeIn('fast');
 	// save last image pos
-	superbgimage_cleanup(img);
-	gLastImagePos = img;
+	// superbgimage_cleanup(img);
+	setTimeout(superbgimage_cleanup, 300, img);	//	老图outspeed已延迟200ms，需增加余量
+	// gLastImagePos = img;
 }
 
 

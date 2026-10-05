@@ -36,7 +36,7 @@ Please retain attribution for both original authors. Derivative modifications fo
 
 2\. Recommended startup parameter \(kiosk large screen mode\)
 
-```Plain Text
+```
 chrome.exe --enable-easy-off-store-extension-install -kiosk chrome-extension://[EXTENSION_ID]/gallery.html
 ```
 
@@ -103,27 +103,25 @@ Upgraded extension manifest from V2 to Manifest V3 to adapt to modern browser sp
 
 2\. Modified scalefit configuration requires manual UI confirmation to take effect
 
-3\. scalefit=2 auto\-scroll only supports `none/fade` transition; other transition types cause coordinate disorder
+3\. Auto\-scroll consumes certain CPU resources; increase fpsinterval to reduce load \(fpsinterval should not be lower than screen refresh cycle\)
 
-4\. Auto\-scroll consumes certain CPU resources; increase fpsinterval to reduce load \(fpsinterval should not be lower than screen refresh cycle\)
+4\. Random mode previous image is also random instead of step back
 
-5\. Random mode previous image is also random instead of step back
+5\. Screen tearing exists in animations due to vertical sync limitations; requires monitor and graphics card hardware VSync support  
 
-6\. Screen tearing exists in animations due to vertical sync limitations; requires monitor and graphics card hardware VSync support  
+6\. Modified control panel numeric settings after file loading still trigger file moving shortcuts — modify settings before loading files  
 
-7\. Modified control panel numeric settings after file loading still trigger file moving shortcuts — modify settings before loading files  
+7\. EXIF rotation information will not be automatically processed \(inherited original legacy issue\)
 
-8\. EXIF rotation information will not be automatically processed \(inherited original legacy issue\)
+8\. GIF animation may not fully play if animation duration exceeds slideshow interval \(unable to accurately obtain GIF duration, interval uses default value\)
 
-9\. GIF animation may not fully play if animation duration exceeds slideshow interval \(unable to accurately obtain GIF duration, interval uses default value\)
+9\. FileSystemAccess write permission restrictions may block folder creation and file moving in partial environments; only console warning without popup prompt
 
-10\. FileSystemAccess write permission restrictions may block folder creation and file moving in partial environments; only console warning without popup prompt
+10\. parentDirHandle will not auto\-update after file moving; manual directory rescanning required to refresh handles
 
-11\. parentDirHandle will not auto\-update after file moving; manual directory rescanning required to refresh handles
+11\. Duplicate filenames in `_TRASH_` directory will cause moving failure \(browser API does not support automatic overwriting/renaming\)
 
-12\. Duplicate filenames in `_TRASH_` directory will cause moving failure \(browser API does not support automatic overwriting/renaming\)
-
-13\. Limited by system and browser rules, mobile browsers only support mobile mode, desktop mode is unavailable; directory selection is invalid, fallback to append\-only multi\-file selection  
+12\. Limited by system and browser rules, mobile browsers only support mobile mode, desktop mode is unavailable; directory selection is invalid, fallback to append\-only multi\-file selection  
   
  
 ---
@@ -150,7 +148,7 @@ Upgraded extension manifest from V2 to Manifest V3 to adapt to modern browser sp
 
 2\. 推荐启动参数（kiosk大屏模式）
 
-```Plain Text
+```
 chrome.exe --enable-easy-off-store-extension-install -kiosk chrome-extension:// 扩展 ID/gallery.html
 ```
 
@@ -218,27 +216,25 @@ DEL：将图片移动到**打开的根目录下 \_TRASH\_ 回收站目录；不�
 
 2\. 修改配置后scalefit状态UI需要手动确认
 
-3\. scalefit=2自动滚动仅支持transition none/fade，其余转场会坐标错乱
+3\. 自动滚动有一定CPU开销，调高fpsinterval可降低负载（fpsinterval应不低于屏幕刷新周期）
 
-4\. 自动滚动有一定CPU开销，调高fpsinterval可降低负载（fpsinterval应不低于屏幕刷新周期）
+4\. 随机模式下上一张图片也是随机，并非后退
 
-5\. 随机模式下上一张图片也是随机，并非后退
+5\. 垂直同步问题，动画中画面撕裂；需显示器、显卡支持并开启硬件垂直同步
 
-6\. 垂直同步问题，动画中画面撕裂；需显示器、显卡支持并开启硬件垂直同步
+6\. 加载文件后控件输入框修改数字，按键仍然会触发文件移动——请在加载文件前修改设置
 
-7\. 加载文件后控件输入框修改数字，按键仍然会触发文件移动——请在加载文件前修改设置
+7\. EXIF旋转（多为移动设备拍摄）不会自动处理，继承原版遗留问题
 
-8\. EXIF旋转（多为移动设备拍摄）不会自动处理，继承原版遗留问题
+8\. gif等动图动画时长超幻灯片间隔时动画播放不全，因其时长难以获取，幻灯片间隔时间只能保持默认不变
 
-9\. gif等动图动画时长超幻灯片间隔时动画播放不全，因其时长难以获取，幻灯片间隔时间只能保持默认不变
+9\. FileSystemAccess写权限限制；部分环境无法新建文件夹、移动文件，按键仅控制台警告，无弹窗报错
 
-10\. FileSystemAccess写权限限制；部分环境无法新建文件夹、移动文件，按键仅控制台警告，无弹窗报错
+10\. 移动后内存列表不会自动更新parentDirHandle；需要重新扫描目录刷新句柄
 
-11\. 移动后内存列表不会自动更新parentDirHandle；需要重新扫描目录刷新句柄
+11\. \_TRASH\_目录存在同名文件移动会报错，浏览器API不会自动重命名覆盖
 
-12\. \_TRASH\_目录存在同名文件移动会报错，浏览器API不会自动重命名覆盖
-
-13\. 受系统和浏览器限制，移动端浏览器浏览模式只支持手机版/移动版，不支持电脑版，无法选择目录，只能退而求其次，多选文件（追加）
+12\. 受系统和浏览器限制，移动端浏览器浏览模式只支持手机版/移动版，不支持桌面版/电脑版，无法选择目录，只能退而求其次，多选文件（追加）
 
 
 ---
@@ -267,8 +263,8 @@ Bundled third‑party libraries keep their original licenses:
 衍生修改部分遵循 **CC‑BY‑3.0 知识共享署名3.0通用协议**。
 进行二次修改、重新分发，必须完整保留全部原作者署名信息。
 
-项目附带第三方组件沿用其原有许可证：
-‑ jQuery：MIT 许可证
+项目附带第三方组件沿用其原有许可证：  
+‑ jQuery：MIT 许可证  
 ‑ jscolor.js：GNU Lesser General Public License v2.1
 
 > 注：部分源代码在AI辅助下完成开发，著作权归 szfzafa 所有。
